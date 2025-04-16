@@ -1,0 +1,92 @@
+-----------------------------
+RAG - Retrieval Augmented Generation (Inserting revelant data in prompt)
+
+
+Context window
+    At a given time how much tokens can be processed 
+    ChatGPT giving answers based on previous chat and context
+RAG optimization
+Vector embeddings --> Giving semantic meaning
+
+-----------------------------
+Types of RAG
+    - 
+-----------------------------
+Steps 
+    1. Indexing
+        index user's prompt
+        divide pdf into parts 
+        give it to open ai and tell it to do vector embedding
+        store that vector into a Vector DB (Pine cone DB) like {page : 1, vectors : [1, 123, 141923, 123192]}
+    2. User gives prompt
+        Find semantic meanings of the prompt
+        Find the vectors in pinecone db 
+        Find all the vectors close to that user's prompt vectors
+        Each vector was linked to a page 
+        Give the model that page number's text now only those important parts are given to the LLM
+
+Part 1
+    Data source
+    Chunking 
+    Embeddings
+    Store it in DB
+
+Part 2
+    User's question
+    Embeddings
+    Search from the vector DB
+    Relevant chunks 
+    Filter chunks from data source 
+    Give to LLM 
+    Output !!!
+
+-----------------------------
+Langchain --> Makes easy to make RAG application from chunking to output
+Vector DBs --> Pinecone, Chroma, pgvector, qdrant, astra
+
+-----------------------------
+
+RAG Chain 
+    loader = pdf_loader()
+    splitter = text_splitter()
+    embedding = OpenAI()
+    qdrant = qdrant()
+    chain = loader | splitter | embedding | qdrant
+    chain.invoke(pdf_path)
+LECL --> LangChain Expression Language 
+Too much abstraction 
+
+
+Overlapping chunks
+Chunk size choosing is an art
+-----------------------------
+Code
+    pip install langchain_community pypdf
+    pip install langchain_text_splitters 
+    pip install langchain_openai
+    pip install langchain_qdrant
+
+Qdrant DB 
+-----------------------------
+RAG 
+
+User query
+Query translation
+    Multi query --> LLM call --> Enrichment node --> Makes 4 more similar queries
+    Breakdown 
+    Fetch chunks based on queries from vector DB
+    Reciprocal ranking 
+        Gives all the retrived chunks and then rank them 
+        Find most revelant docs 
+        Generate arbitrary docs (more data by LLM not from pdf)
+
+
+-----------------------------
+Links
+
+https://x.com/Hiteshdotcom/status/1912559653076213923
+https://app.eraser.io/workspace/zjUq4ETunws45jthYzRh?origin=share&elements=uuszWemFJ5jG3wPiOo7R5w
+https://marketplace.visualstudio.com/items?itemName=hiteshchoudharycode.chai-theme
+-----------------------------
+-----------------------------
+Project 
