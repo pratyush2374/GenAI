@@ -1,0 +1,39 @@
+----------------------------------
+Key concepts
+
+GPT - Generative Pretrained Transformer 
+Difference between GenAI and Core AI
+Vocab size 
+Cut off knowledge
+encoder
+decoder
+vectors
+embeddings
+positional encoding
+temperature
+softmax
+multihead attention 
+
+Phases 
+    Input and encoding (prompt serialization)
+    Vector embedding and semantic meaning 
+    Positional encoding
+    Self attention
+
+Vocab size: 200019 of gpt 4o
+
+
+
+
+----------------------------------
+Links
+
+https://app.eraser.io/workspace/WVuECSpptFUySQegvL2b
+Article Title: Decoding AI jargons with Chai -> #ChaiCode
+https://research.google/pubs/attention-is-all-you-need/
+https://tiktokenizer.vercel.app/
+https://arxiv.org/pdf/1706.03762
+https://github.com/piyushgarg-dev/genai-cohort
+https://app.eraser.io/workspace/WVuECSpptFUySQegvL2b?origin=share
+https://projector.tensorflow.org/
+
