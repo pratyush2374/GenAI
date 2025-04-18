@@ -5,3 +5,5 @@ What i do
     - Query solver
     - Mini cursor
     - Hugging face
+    - Mini cursor
+    
