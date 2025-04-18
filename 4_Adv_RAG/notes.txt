@@ -1,0 +1,86 @@
+------------------------------------------
+Basic RAG
+    Indexing 
+        PDF file converted to chunks 
+        Vector embeddings 
+        Store it in qdrant 
+    Retrieval 
+        User query
+        embedding
+        Find relevant chunks 
+    Generation
+        Give to LLM 
+------------------------------------------
+Advance RAG - Pipeline accuracy increase
+    Query transformation/translation
+    Routing
+    Query construction 
+    Indexing
+    Retrieval
+    Generation
+------------------------------------------
+Today's focus  -> Query transformation/translation
+
+Query = User input
+Translation = Converting it 
+
+User can give garbage prompt, we cannot trust user's prompt 
+Improve the user prompt 
+
+------------------------------------------
+
+Abstraction + Less abstraction both are required 
+User query should be between more abstraction and less abstraction range 
+
+------------------------------------------
+Types of translation - Rewriting, RAG Fusion, Mutiquery 
+    Parallel query (Fan out) retrieval
+        Gen 3 similar query with llm 
+        Convert all of them into vector embeddings
+        Do similarity search 
+        each individual query from the 3 will give x amount of chunks
+        Intersection of chunks
+        Give those chunks to llm 
+        The result will be more closer to what the user wanted 
+        Fan out --> One thing diverging into many then converginng
+    
+
+    Reciprocating Rank Fusion 
+        Ranking a repeated chunk higher
+        Give weightage to higher ranked chunks to the LLMs
+        Resiprocal rank fusion
+        def reciprocal_rank_fusion(rankings, k=60):
+            scores = {}
+            for ranking in rankings:
+                for rank, doc_id in enumerate(ranking):
+                    scores[doc_id] = scores.get(doc_id, 0) + 1 / (k + rank + 1)
+            return sorted(scores.items(), key=lambda x: x[1], reverse=True)
+    
+    Query decomposition 
+        Abstact (Step back prompting)
+            Few shot prompting
+        Less abstract (CoT - Chain of thought - (Breaking down problem))
+            prompt - Generate step by step plan to answer this
+            A answer is generated with the similarity chunks and the sub query (Each individiual query has a answer)    
+            Give this input ans
+    
+    HyDE - Hypothetical Document Embedding (required large models)
+        Ask the llm to write about the user prompt i.e making a hypothetical doc
+        Generate vector embeddings
+        It'll help to find more revelant chunks
+        Then do ranking
+------------------------------------------
+Parallel Query Retrial (fan out), 
+Reciprocate Rank Fusion,
+Step Back Prompting (algo),  
+CoT - Chain of Thought, HyDE - Hypothetical Document Embeddings
+
+------------------------------------------
+
+Links 
+https://app.eraser.io/workspace/W1ItJUWco1xYkXrVLsMR?origin=share&elements=S4hnMrL5mmOrOMWFabf9yQ
+https://chaidocs.vercel.app/contribute/guide
+
+------------------------------------------
+
+Sir maine gemini se cursor banaaya tha bbut wohh baar baar error de rha tha api ka  toh maine fir dost ka code lekar usko apne hisaab se kiya toh mera run ho gya but maine jo approach kiiya tha woh mujhe samjha nhi ek baar abat sakte hhai kyu aisa . error mujhe aaya tha api key end no more request. Mera api key overused aisa error aaay thaa. And woh mujhe baar baar aa rha tha even main new api laa rha tha fir bbhi
