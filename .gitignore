@@ -4,3 +4,4 @@
 
 # Ignore all .venv folders in any folder
 **/.venv/
+**/.venv2/
