@@ -82,5 +82,3 @@ https://app.eraser.io/workspace/W1ItJUWco1xYkXrVLsMR?origin=share&elements=S4hnM
 https://chaidocs.vercel.app/contribute/guide
 
 ------------------------------------------
-
-Sir maine gemini se cursor banaaya tha bbut wohh baar baar error de rha tha api ka  toh maine fir dost ka code lekar usko apne hisaab se kiya toh mera run ho gya but maine jo approach kiiya tha woh mujhe samjha nhi ek baar abat sakte hhai kyu aisa . error mujhe aaya tha api key end no more request. Mera api key overused aisa error aaay thaa. And woh mujhe baar baar aa rha tha even main new api laa rha tha fir bbhi
