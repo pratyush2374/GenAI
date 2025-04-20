@@ -11,6 +11,7 @@ load_dotenv()
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 base_url = "https://generativelanguage.googleapis.com/v1beta/openai/"
 
+# configs
 embedder = GoogleGenerativeAIEmbeddings(
     google_api_key=GEMINI_API_KEY, model="models/text-embedding-004"
 )
@@ -21,15 +22,48 @@ retriever = QdrantVectorStore.from_existing_collection(
     collection_name="langchain",
 )
 
+client = OpenAI(api_key=GEMINI_API_KEY, base_url=base_url)
+
+
+# Used to generate 3 different prompts similar to what the user asked
+def generate_hypo(prompt):
+    system_prompt = """
+        You are an helful AI assitant that takes the inputted user's prompt, analyses it and generates a hypothetical answer to the user's question
+        For context these are prompts related to Node.js 
+        If the user's question is not related to node js, express or javascript say that i am only designed to answer Javasript based questions
+    """
+
+    messages = [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": prompt},
+    ]
+
+    hypo = client.chat.completions.create(
+        model="gemini-2.0-flash", n=1, messages=messages, max_tokens=1500
+    )
+
+    return hypo.choices[0].message.content
+
+
 while True:
     prompt = input(">>> ")
-    result = retriever.similarity_search(query=prompt)
+
+    hypo = generate_hypo(prompt)
+    print("Generated hypothetical answer:")
+    print("********************************************")
+    print(hypo)
+    print("********************************************")
+
+    result = retriever.similarity_search(query=hypo, k=5)
     text = "".join(
-        [f"Page {doc.metadata.get('page_label')}:\n{doc.page_content}" for doc in result]
+        [
+            f"Page {doc.metadata.get('page_label')}:\n{doc.page_content}"
+            for doc in result
+        ]
     )
 
     system_prompt = """
-        You are an helpful AI assitant which parses these text documents that i am giving you and generate a well structured text and in the end you have to say the page numbers where is the text located based on the input
+        You are an helpful AI assistant which parses these text documents that i am giving you and generate a well structured text and in the end you have to say the page numbers where is the text located based on the input
         you work in steps which are "analyse", "think", "output", "validate", "result"
 
         Rules
@@ -40,8 +74,6 @@ while True:
         3. Carefully try to understand what the user is trying to say
         4. If in the "role" : "system" document there is nothing that means the user prompt is not related to the inputted pdf return with {{"step" : "result", "content" : "Invalid prompt, it seems that your input is not related to the uploaded pdf"}}
     """
-
-    client = OpenAI(api_key=GEMINI_API_KEY, base_url=base_url)
 
     class IndividualResponse(BaseModel):
         step: Literal["analyse", "think", "output", "validate", "result"]
@@ -73,3 +105,5 @@ while True:
                 break
         else:
             continue
+
+
