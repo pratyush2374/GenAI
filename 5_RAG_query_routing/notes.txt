@@ -1,0 +1,50 @@
+Routing - Step after query translation 
+---------------------------------------
+
+No fix method or formula 
+
+Types of routing
+    Logical routing
+        Points to the correct data place 
+        When making vector embeddings dont mix up data from different sources, make seperate namespaces for them 
+        Based on the user qury which is the best data source that i should look on and then give the data source names what all you have 
+        Now based on the output seach the revelant namespace instead of searching everywhere
+        A business has a lots of data if proper seperation is not made the similarity serach will give lots of docs and it'll take time as well 
+    Semantic routing
+        Used when making a specific RAG when there are few tasks only 
+        We predefine prompts and their detailed description with placeholders eg - [date range], for all out tasks and then based on the user prompt LLM maps the user prompts to our written prompts
+
+---------------------------------------
+
+Graph DB
+
+
+- Vector DB
+    Vector DBs are good till a limit
+    We lose on relations in vector DB, we need context, which is not the case in Graph DBs
+    
+We we are chunking for each chunk we are getting entities from it through and LLM
+Converting the chunks into vectors and entities into node and defining relationships between them 
+When user queries we find relevant chunks from vector DB 
+Now we ask the LLM to again find entities from the found chunks 
+Then we find those entities in the graph DB and derive a relationship between them 
+We give both the found chunks and relationships to the LLM 
+Now we have a more better context related answer 
+
+---------------------------------------
+Neo4j
+
+Supports vector embeddings + Graph based relationships
+---------------------------------------
+---------------------------------------
+---------------------------------------
+---------------------------------------
+---------------------------------------
+---------------------------------------
+---------------------------------------
+---------------------------------------
+---------------------------------------
+Links
+
+https://app.eraser.io/workspace/nsZG1Pgs978nEmjT9Q3m
+---------------------------------------

@@ -1,0 +1,41 @@
+TRACING
+----------------------------------------------------------------------------
+Open telementry
+Grafana
+Prmomecus 
+Loki
+----------------------------------------------------------------------------
+When there are many docker containers running in auto scaled manner there i a need for a system to store logs from all of them in a single place 
+- How much cpu is getting used 
+- What api endpoints where hitted
+- Errors
+
+----------------------------------------------------------------------------
+In AI applictions it is difficult to track and predict outcomes from an LLM 
+We need to track what the user inputted, what the llm triggered, then what functionality was used, was it correct, what was the appliction flow
+
+----------------------------------------------------------------------------
+Langsmith (Closed source)--> Tracking and tracing 
+
+Making dashboards
+Tracing LLM usage
+Tracing function calls
+Making prompts 
+Versioning prompts
+Pulliung prompts from Langsmith 
+----------------------------------------------------------------------------
+Another opensource version of Langsmith is langfuse
+----------------------------------------------------------------------------
+Lang graph
+
+- Multi model 
+- Checkpointing 
+- Human in the loop 
+- Autonomous vs controlled workflows
+- MCP servers 
+- Guardrails for AI models 
+----------------------------------------------------------------------------
+PR reviewer 
+Database GPT
+AI to Terraform 
+----------------------------------------------------------------------------
