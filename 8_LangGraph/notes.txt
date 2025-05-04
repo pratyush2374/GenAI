@@ -1,0 +1,110 @@
+LANG-GRAPH = Orchestration framework
+
+-------------------------------------------------------------------
+Langchain is a library 
+Langgraph is a framework --> gives a structure to code
+
+As code length increases and complexity increases it become difficult to maintain the code and scale it
+It gives the power to make controllable agents
+
+It asks to make modules --> then we define the flow how the code runs in a graph based pattern 
+.invoke() to run
+
+Making nodes --> Code block 
+Defining edges --> Flow
+
+For every graph invocation we declare a state (data) and then pass it to the first node 
+When the state passes through the graph the state gets updated and in the end we get the updated state
+
+making state
+
+from typing_extensions import TypedDict
+
+class State(TypedDict):
+    user_message : str
+    is_coding_question : bool
+
+
+now define methods for each specific task that take (state : State) as parameter 
+and then make a graph by
+
+
+from langgraph.graph import StateGraph 
+graph_builder = StateGraph(State)
+
+graph_builder.add_node("detect_query", detect_query)
+graph_builder.add_node("solve_coding_question", solve_coding_question)
+graph_builder.add_node("solve_simple_question", solve_simple_question)
+
+from langgraph.graph import START
+
+graph_builder.add_egde(START, "detect_query")
+
+define graph routing using method (conditional routing)
+make a method to route based on on conditions which takes state : State
+
+from typing import Literal
+
+def route_edge(state : State) -> Literal["solve_coding_question", "solve_simple_question"]:
+    if is_coding_question:
+        return "solve_coding_question"
+    else:
+        return "solve_simple_question"
+
+
+Now update(Line 41) --> 
+
+graph_builder.add_egde(START, "detect_query")
+graph_builder.add_conditional_edges("detect_query", route_edge) ---> pass the method 
+
+from langgraph.graph import END
+graph_builder.add_egde("solve_coding_question", END)
+graph_builder.add_egde("solve_simple_question", END)
+
+graph = graph_builder.compile()
+
+def call_graph():
+    state = {
+        "user_message" : "Yo bro"
+    }
+    res = graph.invoke()
+    print(res)
+
+-------------------------------------------------------------------
+
+Workflows 
+    If we completely rely on AI anything can happen and if we reply fully on humnan flexibilty reduces
+    In graph we control the AI and redirect to specific node based on our login (Controlled autonomous flow)
+-------------------------------------------------------------------
+-------------------------------------------------------------------
+-------------------------------------------------------------------
+-------------------------------------------------------------------
+-------------------------------------------------------------------
+-------------------------------------------------------------------
+-------------------------------------------------------------------
+-------------------------------------------------------------------
+-------------------------------------------------------------------
+-------------------------------------------------------------------
+-------------------------------------------------------------------
+-------------------------------------------------------------------
+-------------------------------------------------------------------
+-------------------------------------------------------------------
+-------------------------------------------------------------------
+-------------------------------------------------------------------
+-------------------------------------------------------------------
+-------------------------------------------------------------------
+-------------------------------------------------------------------
+-------------------------------------------------------------------
+-------------------------------------------------------------------
+-------------------------------------------------------------------
+-------------------------------------------------------------------
+-------------------------------------------------------------------
+-------------------------------------------------------------------
+-------------------------------------------------------------------
+-------------------------------------------------------------------
+-------------------------------------------------------------------
+-------------------------------------------------------------------
+-------------------------------------------------------------------
+-------------------------------------------------------------------
+-------------------------------------------------------------------
+-------------------------------------------------------------------

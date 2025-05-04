@@ -1,0 +1,212 @@
+-----------------------------------------------------------------------------
+Text to speech 
+
+Speech to Text --> in built by browsers
+Text to Speech --> In built by browsers but seems like a bot 
+
+-----------------------------------------------------------------------------
+Nari labs/ Dia - 1.6B
+Sesame ai
+-----------------------------------------------------------------------------
+In normal speech to speech Ai 
+
+Speech to Text -> Received context from vector DB + Prompt to AI model --> AI sends response --> Response converted to speech (Dia - requires GPU, time consuming)
+
+now the premium open ai model 
+    User send webRtc request to openai's servers as it is based on UDP it is real time 
+    But here we can give him a context from vector or graph db 
+    
+    Sol - Make a python server
+    Whenever user makes request to the server, server openai to send a token
+    The python server send the system prompt + voice that thay want to use
+    That token is passed to the user 
+    The user then connects to the openai's server 
+    This is called signed URLs (S3)
+    This above thing costs $40 for input and $80 for output for 1M tokens 
+-----------------------------------------------------------------------------
+pip install langchain-google-vertexai
+
+from langchain.chat_models import init_chat_model
+gemini_2_flash = init_chat_model("google_vertexai:gemini-2.0-flash", temperature=0)
+-----------------------------------------------------------------------------
+When we invoke the graph, our states passes through the controlled nodes and then in the end emits a result 
+But when you do .stream()
+then whenever you move from one node to another it emits an event and sends a result 
+-----------------------------------------------------------------------------
+Now for the written code (REFERENCE 1) a new graph is invoked whenever send a new message 
+so now we dont have the access to provious chat about what user said
+one way is to add the data in the Db and whenever a new graph is invoked read from the db and append it to the messages that we are sending in the graph invocation 
+But that's not a feasible way 
+
+
+So there's a concept of checkpointing
+
+Here in for each node a input state is given the node modifies the state and then sends it to the other node 
+We save the node's work in the DB for each node from input to output and other metadata with it 
+When we invoke the graph again then it brings the state back again for context 
+
+So we use a checkpointer when we compile the graph 
+
+
+pip install -U pymongo langgraph-checkpoint-mongodb
+from langgraph.checkpoint.mongodb import MongoDBSaver
+
+with MongoDBSaver.from_conn_string(MONGODB_URI) as checkpointer:
+    graph_with_checkpointer = create_chat_graph(checkpointer)
+
+Every graph invocation is a thread --> We need to giv id for each user's chat so that the checkpointer knows who's chat is linked to whom 
+So we need to give configurations 
+
+config = {"configurable": {"thread_id": "1"}}
+and give it to the .stream() 
+
+If due to some reason if some nodes fail due to an error the checkpointer can rerun them to get the output as the context is stored in the DB 
+
+-----------------------------------------------------------------------------
+HUMAN IN THE LOOP
+
+When we call some tools in out graph, for some sensitive transactions it requires human permission 
+so as to confirm from the user we can interrupt the graph exection in between to ask for confirmation 
+
+it can be done by the graph.
+                            interrupt_after_nodes("node_name")
+                            interrupt_before_nodes("node_name   ") 
+
+
+from langchain_core.tools import tool # This is a decorator
+from langgraph.types import interrupt
+
+This will save the data from the graph in the DB and will exit 
+It will store the data such that i knows that the AI has called the tool and the tool hasn't returned any response, this state will be stored in the DB 
+When the tool returns the answer (some human answers the query) the answer with the previous state goes to the AI
+
+AI give a tool an id, we pass in tbe query to the tool and the graph goes quiet 
+
+@tool()
+def human_assistance_tool(query : str):
+    """Request assistance from a human"""
+    human_response = interrupt({"query" : query})
+    return human_response["data"]
+
+
+Binding the tool with the llm 
+
+tools = [human_assistance_tool]
+llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash", api_key=GEMINI_API_KEY)
+llm_with_tools = llm.bind_tools(tools=tools)
+-----------------------------------------------------------------------------
+Seeing the interruption where it occured, where is the human required in the loop by using get_state()
+
+with MongoDBSaver.from_conn_string(MONGODB_URI) as checkpointer:
+    graph_with_checkpointer = create_chat_graph(checkpointer)
+    state = graph_with_checkpointer.get_state(config=config)
+    for message in state.values["messages"]:
+        message.pretty_print() 
+
+The above will print all the messages we need to get the last message 
+
+-----------------------------------------------------------------------------
+Now on the support/admin side, someone has to answer it 
+
+    state = graph_with_checkpointer.get_state(config=config)
+    # for message in state.values["messages"]:
+    #     message.pretty_print()
+
+    tool_calls = state.values["messages"][
+        -1
+    ].tool_calls  # Getting the arrray of tool calls
+    user_query = None
+
+    for call in tool_calls:
+        if call.get("name") == "human_assistance_tool":
+            user_query = call.get("args").get("query")
+
+    print(f"User's query: {user_query}")
+    answer = input("Solution: >>> ")
+
+
+-----------------------------------------------------------------------------
+To resume the flow 
+
+from langgraph.types import Command
+    resume_command = Command(resume={"data" : answer})
+    graph_with_checkpointer.stream(resume_command, config, stream_mode="values")    
+
+as in the interrupt command @tool() we are returning data 
+@tool()
+def human_assistance_tool(query: str):
+    """Request assistance from a human"""
+    human_response = interrupt({"query": query})
+    return human_response["data"] <------ this data
+
+
+-----------------------------------------------------------------------------
+TO execute a tool 
+
+from langgraph.prebuilt import ToolNode, tools_condition
+
+
+def chatbot(state: State):
+    message = llm_with_tools.invoke(state["messages"])
+    assert len(message.tool_calls) <= 1
+    return {"messages": [message]}
+
+tool_node = ToolNode(tools=[tools])
+graph_builder.add_conditional_edges("chatbot", tools_condition)
+graph_builder.add_edge("tools", "chatbot")
+-----------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+REFERENCE 1
+
+from typing import Annotated
+from typing_extensions import TypedDict
+from langchain_google_genai import GoogleGenerativeAI
+from langgraph.graph.message import add_messages
+from langgraph.graph import StateGraph, START, END
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+
+llm = GoogleGenerativeAI(model="gemini-2.0-flash", api_key=GEMINI_API_KEY)
+
+
+class State(TypedDict):
+    messages: Annotated[list, add_messages]
+
+
+def chatbot(state: State):
+    return {"messages": [llm.invoke(state["messages"])]}
+
+
+graph_builder = StateGraph(State)
+graph_builder.add_node("chatbot", chatbot)
+graph_builder.add_edge(START, "chatbot")
+graph_builder.add_edge("chatbot", END)
+graph = graph_builder.compile()
+
+while True:
+    user_input = input("> ")
+    for event in graph.stream(
+        {"messages": [{"role": "user", "content": user_input}]}, stream_mode="values"
+    ):
+        if "messages" in event:
+            event["messages"][-1].pretty_print()
+
+-----------------------------------------------------------------------------
+-----------------------------------------------------------------------------
