@@ -1,0 +1,79 @@
+-------------------------------------------------------------
+MCP - Model Context Protocol is a set of rules standardized by Antropic to define and call tools so that everyone writing AI code can define tools and use them in a structured way 
+
+We in the previous classes did a tool call by asking the AI nto do {type : action, params : [p1, p2]}
+OpenAI also did this with their API Platform we defined set of rules in the definition (It reqiires a set of JSON data)
+And thenb it'll return the tool call name in response.tools.name and all the needed params 
+But here in the fecthing and executing of the tools was done by the developer so each code was different based on the logic used by the developer
+
+If suppose Google creates a tool for some task and if we integrate it in our code then it will be according to the googl's logic and workflow 
+If a new company's tool is to added then we'll have to write code according to them 
+
+So a generalized protocol is required 
+-------------------------------------------------------------
+So suppose we want to integrate a RAG pipeline in a company 
+which has data in different places 
+So instead of writing tools to get data from them from scratch we take tools written by other developers and then implement in our codebase  
+
+It is a protocol which is a standardized way of writing tool to give context to the Model 
+
+-------------------------------------------------------------
+MCP is an open protocol that standardizes how application provide context to the LLM
+
+Works on client server architecture where a host application can connect to multiple servers 
+
+MCP Client 
+MCP Server (multiple)
+    Each MCP server can have multiple tasks getting performed 
+
+My AI project will call the MCP client. The MCP client will communicate with the MCP server, which will execute the task. The response will then be sent back to the MCP client and finally returned to my AI project
+
+-------------------------------------------------------------
+MCP Hosts: Programs like Claude Desktop, IDEs, or AI tools that want to access data through MCP
+MCP Clients: Protocol clients that maintain 1:1 connections with servers
+MCP Servers: Lightweight programs that each expose specific capabilities through the standardized Model Context Protocol
+-------------------------------------------------------------
+We can store available tools, prompts, sample prompts 
+As HTTP uses TCP as it communication mechanism MCP uses Standard Input Output aka stdio
+ie MCP Client and Server communicates via stdio
+
+So there is no networking involved in it 
+So the MCP server needs to run locally in your machine 
+
+-------------------------------------------------------------
+Whenever the MCP Client starts it sends a command to list tools 
+The server send tools and its description 
+
+Whenever our host needs to use any tool it will call them with the desired params
+-------------------------------------------------------------
+
+It majorly works on 
+    STDIO
+    Server Sent Events
+        Enables server to client streaming with HTTP POST requests for client to server communication 
+        Use only when 
+            only server to client streaming is needed 
+            Working with restricted networks 
+            Imlementing simple updates
+
+
+We'll create 2 routes 
+    /sse -> The client will connect to the MCP server via this endpoint 
+    /message -> It will send its command to this endpoint and the response will be sent via /sse as /sse is an active connection like sockets but it is on SSE 
+-------------------------------------------------------------
+To configure a MCP server either we need to give the path of the file with the command or the url/sse hosted on our server 
+-------------------------------------------------------------
+https://cursor.directory
+-------------------------------------------------------------
+-------------------------------------------------------------
+-------------------------------------------------------------
+-------------------------------------------------------------
+-------------------------------------------------------------
+-------------------------------------------------------------
+-------------------------------------------------------------
+-------------------------------------------------------------
+-------------------------------------------------------------
+-------------------------------------------------------------
+-------------------------------------------------------------
+-------------------------------------------------------------
+-------------------------------------------------------------
