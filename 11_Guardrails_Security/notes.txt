@@ -1,0 +1,49 @@
+----------------------------------------------------------------------------
+Guardrails - Guardrails are constraints or guidelines designed to ensure AI systems behave safely, ethically, and within desired boundaries.
+    Input Guardrails
+        Added before sending the prompt from the user to the LLM 
+        It can reject a user's prompt otherwise it can mask the sensitive data and then send it to the LLM 
+    Output Guardrails - Added after the LLM outputs answer and sends it to the user 
+
+----------------------------------------------------------------------------
+As we dont want our data to go to the external LLM like OpenAI, we cant use regex as it is not helpful, cannot take edge cases, cannot get context of words like apple (company) and apple (fruit) both are different 
+ 
+So the best solution is to host a mini model locally and then divide the task into 3 layers
+    1st -> Reject user prompt if it contains any inappropriate language 
+    2nd -> If the prompt is safe to execute, then we can perform checks on it weather the user prompt has any sensitive information in it  
+    3rd -> If there is any sensitive information in it, either reject the prompt or mask the data in it and then send it to the larger external LLM 
+----------------------------------------------------------------------------
+For guardrailing on the output side we use the concept of LLM as a judge 
+For this we either use a locally running model or another LLM 
+We give the user's prompt and we say that this is the LLM's output, the judge LLM then gives score based on the output 
+If the score is good pass it on to the user, if not then we'll ask the judge to rewrite the user's prompt so that i can get a better accuracy 
+----------------------------------------------------------------------------
+A2A
+
+
+----------------------------------------------------------------------------
+----------------------------------------------------------------------------
+----------------------------------------------------------------------------
+----------------------------------------------------------------------------
+----------------------------------------------------------------------------
+----------------------------------------------------------------------------
+----------------------------------------------------------------------------
+----------------------------------------------------------------------------
+----------------------------------------------------------------------------
+----------------------------------------------------------------------------
+----------------------------------------------------------------------------
+----------------------------------------------------------------------------
+----------------------------------------------------------------------------
+----------------------------------------------------------------------------
+----------------------------------------------------------------------------
+----------------------------------------------------------------------------
+----------------------------------------------------------------------------
+----------------------------------------------------------------------------
+----------------------------------------------------------------------------
+----------------------------------------------------------------------------
+----------------------------------------------------------------------------
+----------------------------------------------------------------------------
+----------------------------------------------------------------------------
+----------------------------------------------------------------------------
+----------------------------------------------------------------------------
+----------------------------------------------------------------------------
